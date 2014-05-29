@@ -125,46 +125,37 @@ class RestService
   {
     $this->logger->info(sprintf("%s", __METHOD__), array( $url, $method, $params, $headers));
     $ch = curl_init();
-    $timeout = 0; // set to zero for no timeout
+
     curl_setopt($ch, CURLOPT_URL, $url);
-    
-    $filename = "/dev/null";
-    $fp = fopen($filename, 'w+');//This is the file where we save the    information
-    curl_setopt($ch, CURLOPT_FILE, $fp); // here it sais to curl to just save it
-    
+
     curl_setopt($ch,CURLOPT_PORT,443);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     
     if($method == "POST")
     {
       curl_setopt($ch, CURLOPT_POST, 1);
+      if($encode_post)
+      {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params)); // why json?
+      }
+      else
+      {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+      }
     }
     if($method == "PUT")
     {
       curl_setopt($ch, CURLOPT_PUT, 1);
     }
     
-    
     curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
-    
-    if($encode_post)
-    {
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));  
-    }
-    else
-    {
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-    }
 
     $file_contents = curl_exec($ch);
     $header = curl_getinfo($ch);
     curl_close($ch);
-    
-    fwrite($fp, $file_contents);//write curl response to file
-    fclose($fp);
 
     if ($header['http_code'] != 200)
     {
-
       switch ($header['http_code'])
       {
         case '500':
