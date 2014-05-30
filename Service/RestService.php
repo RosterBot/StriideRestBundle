@@ -134,6 +134,14 @@ class RestService
     if($method == "POST")
     {
       curl_setopt($ch, CURLOPT_POST, 1);
+    }
+
+    if($method == "PUT")
+    {
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+    }
+
+    if($method == 'PUT' || $method == 'POST') {
       if($encode_post)
       {
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params)); // why json?
@@ -142,10 +150,6 @@ class RestService
       {
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
       }
-    }
-    if($method == "PUT")
-    {
-      curl_setopt($ch, CURLOPT_PUT, 1);
     }
     
     curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
